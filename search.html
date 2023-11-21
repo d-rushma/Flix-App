@@ -33,8 +33,31 @@
         </nav>
       </div>
     </header>
+    <section class="search">
+      <div class="container">
+        <div id="alert"></div>
+        <form action="search.html" class="search-form">
+          <div class="search-radio">
+            <input type="radio" id="movie" name="type" value="movie" checked />
+            <label for="movies">Movies</label>
+            <input type="radio" id="tv" name="type" value="tv" />
+            <label for="shows">TV Shows</label>
+          </div>
+          <div class="search-flex">
+            <input
+              type="text"
+              name="search-term"
+              id="search-term"
+              placeholder="Enter Movie Name"
+            />
+            <button class="btn" type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
     <section class="container">
-      <h2>Popular Shows</h2>
       <div class="card">
         <a href="movie-details.html?id=1">
           <img src="/images/no-image.jpg" class="card-img-top" alt="Movie" />
@@ -121,6 +144,13 @@
           <p class="card-text">
             <small class="text-muted">Release: XX/XX/XXXX</small>
           </p>
+        </div>
+      </div>
+      <div id="pagination">
+        <div class="pagination">
+          <button class="btn btn-primary" id="prev">Prev</button>
+          <button class="btn btn-primary" id="next">Next</button>
+          <div class="page-counter" id="next">Page 1 of 5</div>
         </div>
       </div>
     </section>
