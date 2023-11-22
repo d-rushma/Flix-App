@@ -202,6 +202,7 @@ section h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 .swiper-slide img {
   display: block;

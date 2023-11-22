@@ -1,5 +1,11 @@
 global = {
   currentPage: window.location.pathname,
+  search: {
+    term: "",
+    type: "",
+    page: 1,
+    totalPages: 1,
+  },
 };
 
 // Highlight active link based on page
@@ -225,12 +231,70 @@ async function fetchAPIData(endpoint) {
   hideSpinner();
   return data;
 }
+// Search movie
+async function searchData(endpoint) {
+  const API_KEY = "9b66958f040bf6ea158b4abd767b0660";
+  const API_URL = "https://api.themoviedb.org/3/";
+  showSpinner();
+  const response = await fetch(
+    `${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}`
+  );
+  const data = await response.json();
+  hideSpinner();
+  return data;
+}
+
 // add commas to number
 function addCommas(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-//Loading... Spinner
+// Display Slider Movies
+async function displaySlider() {
+  const { results } = await fetchAPIData("movie/now_playing");
+  const swiperWrapper = document.querySelector(".swiper-wrapper");
+  results.forEach((movie) => {
+    const div = document.createElement("div");
+    div.classList.add("swiper-slide");
+
+    div.innerHTML = `
+      <a href="movie-details.html?id=${movie.id}">
+        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />
+      </a>
+      <h4 class="swiper-rating">
+        <i class="fas fa-star text-secondary"></i> ${movie.vote_average} / 10
+      </h4>
+    `;
+    swiperWrapper.appendChild(div);
+    initSwiper();
+  });
+}
+//swiper Api
+function initSwiper() {
+  const swiper = new Swiper(".swiper", {
+    slidesPerView: 1,
+    spaceBetween: 30,
+    freeMode: true,
+    loop: true,
+    autoplay: {
+      delay: 2000,
+      disableOnInteraction: false,
+    },
+    breakpoints: {
+      500: {
+        slidesPerView: 2,
+      },
+      700: {
+        slidesPerView: 3,
+      },
+      1024: {
+        slidesPerView: 4,
+      },
+    },
+  });
+}
+
+// //Loading... Spinner
 function showSpinner() {
   document.querySelector(".spinner").classList.add("show");
 }
@@ -240,26 +304,46 @@ function hideSpinner() {
   document.querySelector(".spinner").classList.remove("show");
 }
 
+async function search() {
+  const query = window.location.search;
+  const params = new URLSearchParams(query);
+  global.search.type = params.get("type");
+  global.search.term = params.get("search-term");
+  if (global.search.term != "" && global.search.type !== null) {
+    const results = await searchData();
+    console.log(results);
+  } else {
+    showAlert("Fillout Search Field");
+  }
+}
+
+// Show Alert
+function showAlert(message, className = "error") {
+  const alertEl = document.createElement("div");
+  alertEl.classList.add("alert", className);
+  alertEl.appendChild(document.createTextNode(message));
+  document.querySelector("#alert").appendChild(alertEl);
+  setTimeout(() => alertEl.remove(), 4000);
+}
+
 function init() {
   switch (global.currentPage) {
     case "/":
     case "/index.html":
+      displaySlider();
       displayPopularMovies();
-      console.log("Home");
       break;
     case "/shows.html":
       displayPopularShows();
-      // console.log("Shows");
       break;
     case "/movie-details.html":
       displayMovieDetails();
-      // console.log("Movie Details");
       break;
     case "/tv-details.html":
       displayShowDetails();
-      //   console.log("TV Details");
       break;
     case "/search.html":
+      search();
       //   console.log("Search");
       break;
   }
